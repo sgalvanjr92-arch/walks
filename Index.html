@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitCollab - Share Your GitHub Collaborations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-3xl font-bold">GitCollab</h1>
+            <nav>
+                <a href="#features" class="px-4 hover:text-gray-300">Features</a>
+                <a href="#projects" class="px-4 hover:text-gray-300">Projects</a>
+                <a href="#contact" class="px-4 hover:text-gray-300">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white py-20">
+        <div class="container mx-auto text-center">
+            <h2 class="text-5xl font-extrabold mb-4">Collaborate and Innovate</h2>
+            <p class="text-xl mb-8">Share your GitHub projects and find collaborators to build amazing things together.</p>
+            <a href="#projects" class="bg-white text-blue-600 font-bold rounded-full py-4 px-8 hover:bg-gray-200 transition duration-300">View Projects</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-12">Why Choose GitCollab?</h2>
+            <div class="flex flex-wrap -mx-4">
+                <div class="w-full md:w-1/3 px-4 mb-8">
+                    <div class="rounded-lg shadow-lg p-8 text-center h-full">
+                        <div class="text-5xl text-blue-600 mb-4">🚀</div>
+                        <h3 class="text-2xl font-bold mb-2">Showcase Your Work</h3>
+                        <p class="text-gray-600">Easily display your GitHub repositories in a clean and organized manner.</p>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/3 px-4 mb-8">
+                    <div class="rounded-lg shadow-lg p-8 text-center h-full">
+                        <div class="text-5xl text-blue-600 mb-4">🤝</div>
+                        <h3 class="text-2xl font-bold mb-2">Find Collaborators</h3>
+                        <p class="text-gray-600">Connect with other developers who are passionate about similar projects.</p>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/3 px-4 mb-8">
+                    <div class="rounded-lg shadow-lg p-8 text-center h-full">
+                        <div class="text-5xl text-blue-600 mb-4">💡</div>
+                        <h3 class="text-2xl font-bold mb-2">Spark Innovation</h3>
+                        <p class="text-gray-600">Bring your ideas to life by collaborating with a diverse community of developers.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-20">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-12">Featured Projects</h2>
+            <div id="project-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Projects will be dynamically inserted here -->
+            </div>
+            <div class="text-center mt-12">
+                <button id="add-project-btn" class="bg-blue-600 text-white font-bold rounded-full py-4 px-8 hover:bg-blue-700 transition duration-300">Add Your Project</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Add Project Modal -->
+    <div id="project-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
+            <h3 class="text-2xl font-bold mb-4">Add a New Project</h3>
+            <form id="project-form">
+                <div class="mb-4">
+                    <label for="repo-url" class="block text-gray-700 font-bold mb-2">GitHub Repository URL</label>
+                    <input type="url" id="repo-url" placeholder="https://github.com/user/repo" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div class="text-right">
+                    <button type="button" id="cancel-btn" class="bg-gray-500 text-white font-bold py-2 px-4 rounded-lg mr-2 hover:bg-gray-600">Cancel</button>
+                    <button type="submit" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Add Project</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-12">Get In Touch</h2>
+            <div class="max-w-lg mx-auto">
+                <form action="#" method="POST">
+                    <div class="mb-4">
+                        <label for="name" class="block text-gray-700 font-bold mb-2">Name</label>
+                        <input type="text" id="name" class="w-full px-3 py-2 border rounded-lg" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="email" class="block text-gray-700 font-bold mb-2">Email</label>
+                        <input type="email" id="email" class="w-full px-3 py-2 border rounded-lg" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="message" class="block text-gray-700 font-bold mb-2">Message</label>
+                        <textarea id="message" rows="4" class="w-full px-3 py-2 border rounded-lg" required></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="bg-blue-600 text-white font-bold rounded-full py-4 px-8 hover:bg-blue-700 transition duration-300">Send Message</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="gradient-bg text-white py-6">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2024 GitCollab. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Message Box -->
+    <div id="message-box" class="fixed bottom-5 right-5 text-white py-3 px-5 rounded-lg shadow-lg opacity-0 translate-y-3 transition-all duration-300 z-50">
+        <p id="message-text"></p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // --- Firebase Configuration ---
+        // This configuration is now handled by the environment.
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // --- Initialize Firebase ---
+        let app, db, auth;
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+        } catch (error) {
+            console.error("Firebase initialization failed:", error);
+            showMessage("Error: Could not initialize the application. Please refresh the page.");
+        }
+
+
+        // --- DOM Elements ---
+        const addProjectBtn = document.getElementById('add-project-btn');
+        const projectModal = document.getElementById('project-modal');
+        const projectForm = document.getElementById('project-form');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const projectList = document.getElementById('project-list');
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+
+        // --- Functions ---
+
+        /**
+         * Shows a notification message to the user.
+         * @param {string} message - The message to display.
+         * @param {boolean} [isError=true] - If true, shows an error-styled message.
+         */
+        function showMessage(message, isError = true) {
+            messageText.textContent = message;
+            messageBox.classList.toggle('bg-red-600', isError);
+            messageBox.classList.toggle('bg-green-600', !isError);
+            messageBox.classList.remove('opacity-0', 'translate-y-3');
+
+            setTimeout(() => {
+                messageBox.classList.add('opacity-0', 'translate-y-3');
+            }, 3000);
+        }
+
+        /**
+         * Fetches repository data from the GitHub API.
+         * @param {string} repoUrl - The URL of the GitHub repository.
+         * @returns {Promise<object|null>} - The repository data or null if an error occurs.
+         */
+        async function getRepoData(repoUrl) {
+            const apiUrl = repoUrl.replace('github.com', 'api.github.com/repos');
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(`Repository not found or API limit reached. Status: ${response.status}`);
+                }
+                return await response.json();
+            } catch (error) {
+                console.error("Error fetching repo data:", error);
+                showMessage('Could not fetch repository data. Please check the URL.');
+                return null;
+            }
+        }
+
+        /**
+         * Renders a single project card and appends it to the project list.
+         * @param {object} doc - The Firestore document for the project.
+         */
+        function renderProject(doc) {
+            const project = doc.data();
+            const projectCard = document.createElement('div');
+            projectCard.className = 'bg-white rounded-lg shadow-lg p-6 transform hover:-translate-y-2 transition duration-300 flex flex-col';
+            projectCard.innerHTML = `
+                <div class="flex-grow">
+                    <h3 class="text-2xl font-bold mb-2">${project.name}</h3>
+                    <p class="text-gray-600 mb-4">${project.description || 'No description available.'}</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-center text-sm text-gray-500 mb-4">
+                        <span>⭐ ${project.stars}</span>
+                        <span>Forks: ${project.forks}</span>
+                        <span>${project.language || 'N/A'}</span>
+                    </div>
+                    <a href="${project.url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 font-semibold hover:underline">View on GitHub</a>
+                </div>
+            `;
+            projectList.appendChild(projectCard);
+        }
+
+        // --- Event Listeners ---
+        addProjectBtn.addEventListener('click', () => {
+            projectModal.classList.remove('hidden');
+            projectModal.classList.add('flex');
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            projectModal.classList.add('hidden');
+            projectModal.classList.remove('flex');
+        });
+
+        projectForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const repoUrlInput = document.getElementById('repo-url');
+            const repoUrl = repoUrlInput.value;
+            const submitButton = projectForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Adding...';
+
+            const repoData = await getRepoData(repoUrl);
+
+            if (repoData && db) {
+                try {
+                    const projectsCollectionRef = collection(db, `artifacts/${appId}/public/data/projects`);
+                    await addDoc(projectsCollectionRef, {
+                        name: repoData.name,
+                        description: repoData.description,
+                        url: repoData.html_url,
+                        stars: repoData.stargazers_count,
+                        forks: repoData.forks_count,
+                        language: repoData.language,
+                        createdAt: serverTimestamp()
+                    });
+                    showMessage('Project added successfully!', false);
+                    projectForm.reset();
+                    projectModal.classList.add('hidden');
+                    projectModal.classList.remove('flex');
+                } catch (error) {
+                    console.error("Error adding document: ", error);
+                    showMessage('Failed to add project. Please try again.');
+                }
+            }
+            submitButton.disabled = false;
+            submitButton.textContent = 'Add Project';
+        });
+        
+        // --- Firebase Authentication and Data Loading ---
+        if (auth) {
+            onAuthStateChanged(auth, user => {
+                if (user) {
+                    // User is signed in.
+                    console.log("User is authenticated:", user.uid);
+                    const projectsCollectionRef = collection(db, `artifacts/${appId}/public/data/projects`);
+                    
+                    onSnapshot(projectsCollectionRef, (snapshot) => {
+                        projectList.innerHTML = ''; // Clear the list before re-rendering
+                        const sortedDocs = snapshot.docs.sort((a, b) => {
+                           const dateA = a.data().createdAt?.toDate() || 0;
+                           const dateB = b.data().createdAt?.toDate() || 0;
+                           return dateB - dateA; // Sort descending
+                        });
+                        sortedDocs.forEach(renderProject);
+                    }, (error) => {
+                        console.error("Error fetching projects:", error);
+                        showMessage("Could not load projects. Check console for details.");
+                    });
+
+                } else {
+                    // User is signed out, attempt to sign in.
+                    (async () => {
+                        try {
+                            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                                await signInWithCustomToken(auth, __initial_auth_token);
+                            } else {
+                                await signInAnonymously(auth);
+                            }
+                        } catch (error) {
+                            console.error("Sign-in failed:", error);
+                            showMessage("Error: Could not connect to the database.");
+                        }
+                    })();
+                }
+            });
+        }
+
+        // --- Smooth scrolling for navigation links ---
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetElement = document.querySelector(this.getAttribute('href'));
+                if(targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>
