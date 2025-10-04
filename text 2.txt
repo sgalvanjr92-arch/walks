@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viral Audio Playlist Player</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .player-card {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease-in-out;
+        }
+        .progress-bar-container {
+            background-color: #e5e7eb;
+            cursor: pointer;
+        }
+        .progress-bar {
+            background-color: #4f46e5;
+            transition: width 0.1s linear;
+        }
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .playlist-item.active {
+            background-color: #e0e7ff;
+            color: #3730a3;
+        }
+        /* Hide the default audio player */
+        audio {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-sm mx-auto bg-white rounded-xl player-card overflow-hidden">
+        <div class="p-6">
+            <img id="albumArt" src="https://placehold.co/400x400/6366f1/ffffff?text=AudioPlayer" alt="Album Art" class="w-full h-auto rounded-lg shadow-md mb-6">
+            
+            <div class="text-center">
+                <h2 id="audioTitle" class="text-2xl font-bold text-gray-800 truncate">Select a Track</h2>
+                <p id="audioArtist" class="text-md text-gray-500">From the playlist below</p>
+            </div>
+
+            <!-- Custom Audio Player Controls -->
+            <div class="mt-8">
+                <div class="flex justify-between text-xs text-gray-500">
+                    <span id="currentTime">0:00</span>
+                    <span id="duration">0:00</span>
+                </div>
+                <div class="progress-bar-container w-full h-2 rounded-full mt-1">
+                    <div id="progressBar" class="progress-bar h-2 rounded-full" style="width: 0%;"></div>
+                </div>
+
+                <div class="flex items-center justify-center space-x-8 mt-6">
+                    <button id="prevBtn" class="text-gray-600 hover:text-indigo-600 transition"><i class="fas fa-backward-step text-2xl"></i></button>
+                    <button id="playPauseBtn" class="text-gray-700 hover:text-indigo-600 transition">
+                        <i class="fas fa-play text-4xl"></i>
+                    </button>
+                    <button id="nextBtn" class="text-gray-600 hover:text-indigo-600 transition"><i class="fas fa-forward-step text-2xl"></i></button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Playlist -->
+        <div class="bg-gray-50 px-2 py-2">
+             <h3 class="text-sm font-semibold text-gray-600 px-4 mb-2">Playlist</h3>
+             <ul id="playlist" class="max-h-40 overflow-y-auto">
+                <!-- Playlist items will be injected here by JavaScript -->
+             </ul>
+        </div>
+        
+        <div class="p-6 bg-gray-50 border-t border-gray-200">
+             <button id="shareBtn" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <i class="fas fa-share-alt mr-2"></i> Share Current Audio
+            </button>
+            <div class="mt-4 text-center">
+                <p class="text-xs text-gray-400">Your User ID (for sharing):</p>
+                <p id="userIdDisplay" class="text-xs text-gray-500 font-mono break-all">-</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio element -->
+    <audio id="audioPlayer" preload="metadata"></audio>
+
+    <!-- Share Modal -->
+    <div id="shareModal" class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop hidden">
+        <div class="bg-white rounded-lg shadow-xl p-8 m-4 max-w-md w-full">
+            <h3 class="text-2xl font-bold mb-4 text-gray-800">Share with Someone</h3>
+            <p class="text-gray-600 mb-6">Enter their email and a message. We'll track the share for analytics.</p>
+            <form id="shareForm">
+                <div class="mb-4">
+                    <label for="recipientEmail" class="block text-sm font-medium text-gray-700">Recipient's Email</label>
+                    <input type="email" id="recipientEmail" name="recipientEmail" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+                <div class="mb-6">
+                    <label for="shareMessage" class="block text-sm font-medium text-gray-700">Your Message (optional)</label>
+                    <textarea id="shareMessage" name="shareMessage" rows="3" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" id="cancelShareBtn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Send Share</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Notification Toast -->
+    <div id="notification" class="fixed bottom-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg opacity-0 transition-opacity duration-300">
+        Message sent successfully!
+    </div>
+
+    <script type="module">
+        // --- Firebase SDK Imports ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- DOM Elements ---
+        const audioPlayer = document.getElementById('audioPlayer');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const playIcon = playPauseBtn.querySelector('i');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressBarContainer = progressBar.parentElement;
+        const currentTimeEl = document.getElementById('currentTime');
+        const durationEl = document.getElementById('duration');
+        const shareBtn = document.getElementById('shareBtn');
+        const shareModal = document.getElementById('shareModal');
+        const cancelShareBtn = document.getElementById('cancelShareBtn');
+        const shareForm = document.getElementById('shareForm');
+        const notification = document.getElementById('notification');
+        const userIdDisplay = document.getElementById('userIdDisplay');
+        const albumArt = document.getElementById('albumArt');
+        const audioTitle = document.getElementById('audioTitle');
+        const audioArtist = document.getElementById('audioArtist');
+        const playlistEl = document.getElementById('playlist');
+
+        // --- Playlist Data ---
+        const playlist = [
+            { id: 'l_train_sample', title: 'L Train Ride', artist: 'NYC Sounds', src: 'https://storage.googleapis.com/voice-quickstart/L_train.mp3', albumArt: 'https://placehold.co/400x400/6366f1/ffffff?text=L+Train' },
+            { id: 'uplifting_tune', title: 'Uplifting Tune', artist: 'ExoPlayer', src: 'https://storage.googleapis.com/exoplayer-test-media-0/play.mp3', albumArt: 'https://placehold.co/400x400/f59e0b/ffffff?text=Uplifting' },
+            { id: 'snow_fight', title: 'Snow Fight', artist: 'Sintel', src: 'https://storage.googleapis.com/media-session/sintel/snow-fight.mp3', albumArt: 'https://placehold.co/400x400/10b981/ffffff?text=Snow+Fight' },
+            { id: 'jazz_funk', title: 'Jazz Funk', artist: 'Public Domain', src: 'https://storage.googleapis.com/media-session/samples/creative-commons/jazz-funk-break-113.mp3', albumArt: 'https://placehold.co/400x400/ec4899/ffffff?text=Jazz' }
+        ];
+
+        // --- App State ---
+        let isPlaying = false;
+        let userId = null;
+        let db = null;
+        let currentTrackIndex = 0;
+        
+        // --- Firebase Setup ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-audio-app';
+        let firebaseConfig;
+        try {
+            firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        } catch (e) {
+            console.error("Failed to parse firebase config:", e);
+            firebaseConfig = null;
+        }
+
+        async function initializeFirebase() {
+            if (!firebaseConfig) {
+                console.error("Firebase config is missing or invalid.");
+                userIdDisplay.textContent = "Error: Firebase not configured.";
+                return;
+            }
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                const auth = getAuth(app);
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) { userId = user.uid; userIdDisplay.textContent = userId; } 
+                    else { userIdDisplay.textContent = "Not signed in"; }
+                });
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+                userIdDisplay.textContent = "Error: Auth failed.";
+            }
+        }
+        
+        // --- Analytics Functions ---
+        async function logPlayEvent() {
+            if (!db || !userId) return;
+            const track = playlist[currentTrackIndex];
+            try {
+                await addDoc(collection(db, `/artifacts/${appId}/public/data/plays`), {
+                    userId: userId,
+                    audioId: track.id,
+                    audioTitle: track.title,
+                    timestamp: serverTimestamp(),
+                    userAgent: navigator.userAgent
+                });
+            } catch (e) { console.error("Error adding play event document: ", e); }
+        }
+
+        async function logShareEvent(recipientEmail, message) {
+            if (!db || !userId) return;
+            const track = playlist[currentTrackIndex];
+            try {
+                await addDoc(collection(db, `/artifacts/${appId}/public/data/shares`), {
+                    sharerId: userId,
+                    recipientEmail: recipientEmail,
+                    message: message,
+                    audioId: track.id,
+                    audioTitle: track.title,
+                    timestamp: serverTimestamp()
+                });
+                showNotification('Share logged successfully!');
+            } catch (e) {
+                console.error("Error adding share event document: ", e);
+                showNotification('Failed to log share.', true);
+            }
+        }
+        
+        // --- Playlist & Player Logic ---
+        function renderPlaylist() {
+            playlistEl.innerHTML = '';
+            playlist.forEach((track, index) => {
+                const li = document.createElement('li');
+                li.className = `flex items-center justify-between p-3 rounded-md cursor-pointer hover:bg-gray-200 playlist-item ${index === currentTrackIndex ? 'active' : ''}`;
+                li.dataset.index = index;
+                li.innerHTML = `
+                    <div class="flex items-center">
+                        <img src="${track.albumArt}" class="w-10 h-10 rounded-md mr-3">
+                        <div>
+                            <p class="font-semibold text-sm text-gray-800">${track.title}</p>
+                            <p class="text-xs text-gray-500">${track.artist}</p>
+                        </div>
+                    </div>
+                    <i class="fas fa-play text-indigo-600 opacity-0"></i>
+                `;
+                li.addEventListener('click', () => {
+                    loadTrack(index);
+                    playAudio();
+                });
+                playlistEl.appendChild(li);
+            });
+        }
+
+        function loadTrack(index) {
+            currentTrackIndex = index;
+            const track = playlist[index];
+            audioTitle.textContent = track.title;
+            audioArtist.textContent = track.artist;
+            albumArt.src = track.albumArt;
+            albumArt.onerror = () => albumArt.src = 'https://placehold.co/400x400/cccccc/ffffff?text=Error';
+            audioPlayer.src = track.src;
+            
+            progressBar.style.width = '0%';
+            currentTimeEl.textContent = '0:00';
+            durationEl.textContent = '0:00';
+
+            updatePlaylistUI();
+        }
+
+        function updatePlaylistUI() {
+             const items = playlistEl.querySelectorAll('li');
+             items.forEach((item, index) => {
+                const playIcon = item.querySelector('i');
+                if (index === currentTrackIndex) {
+                    item.classList.add('active');
+                    playIcon.className = isPlaying ? 'fas fa-pause text-indigo-600 opacity-100' : 'fas fa-play text-indigo-600 opacity-100';
+                } else {
+                    item.classList.remove('active');
+                    playIcon.className = 'fas fa-play text-indigo-600 opacity-0';
+                }
+             });
+        }
+        
+        function playAudio() {
+            if (audioPlayer.src) {
+                audioPlayer.play();
+                logPlayEvent();
+            }
+        }
+        
+        function pauseAudio() {
+            audioPlayer.pause();
+        }
+
+        function togglePlayPause() {
+            if (isPlaying) {
+                pauseAudio();
+            } else {
+                playAudio();
+            }
+        }
+
+        function playNextTrack() {
+            const newIndex = (currentTrackIndex + 1) % playlist.length;
+            loadTrack(newIndex);
+            playAudio();
+        }
+
+        function playPrevTrack() {
+            const newIndex = (currentTrackIndex - 1 + playlist.length) % playlist.length;
+            loadTrack(newIndex);
+            playAudio();
+        }
+
+        // --- Event Listeners ---
+        audioPlayer.addEventListener('play', () => { isPlaying = true; playIcon.classList.replace('fa-play', 'fa-pause'); updatePlaylistUI(); });
+        audioPlayer.addEventListener('pause', () => { isPlaying = false; playIcon.classList.replace('fa-pause', 'fa-play'); updatePlaylistUI(); });
+        audioPlayer.addEventListener('ended', playNextTrack);
+        audioPlayer.addEventListener('loadedmetadata', () => { durationEl.textContent = formatTime(audioPlayer.duration); });
+        audioPlayer.addEventListener('timeupdate', () => {
+            const progressPercent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+            currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
+        });
+
+        playPauseBtn.addEventListener('click', togglePlayPause);
+        nextBtn.addEventListener('click', playNextTrack);
+        prevBtn.addEventListener('click', playPrevTrack);
+        
+        progressBarContainer.addEventListener('click', (e) => {
+            const width = progressBarContainer.clientWidth;
+            const clickX = e.offsetX;
+            audioPlayer.currentTime = (clickX / width) * audioPlayer.duration;
+        });
+        
+        shareBtn.addEventListener('click', () => shareModal.classList.remove('hidden'));
+        cancelShareBtn.addEventListener('click', () => shareModal.classList.add('hidden'));
+        shareForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const recipientEmail = document.getElementById('recipientEmail').value;
+            const message = document.getElementById('shareMessage').value;
+            logShareEvent(recipientEmail, message);
+            shareModal.classList.add('hidden');
+            shareForm.reset();
+        });
+        
+        // --- Utility Functions ---
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+        function showNotification(message, isError = false) {
+            notification.textContent = message;
+            notification.className = `fixed bottom-5 right-5 text-white py-2 px-4 rounded-lg shadow-lg transition-opacity duration-300 ${isError ? 'bg-red-500' : 'bg-green-500'}`;
+            notification.classList.remove('opacity-0');
+            setTimeout(() => { notification.classList.add('opacity-0'); }, 3000);
+        }
+
+        // --- Initial Load ---
+        window.addEventListener('load', () => {
+            initializeFirebase();
+            renderPlaylist();
+            loadTrack(0); // Load the first track by default
+        });
+    </script>
+</body>
+</html>
+
+
